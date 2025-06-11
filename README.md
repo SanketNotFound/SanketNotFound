@@ -1,6 +1,17 @@
 <h1 align="center">Hi 👋, I'm Sanket Veerkar</h1>
 <h3 align="center">Code, Data, Beats — v0.1 beta 🎧</h3>
 
+<div align = "center">
+  <p>
+<pre>
+  <code class="language-html"  align = "center">
+     "Anything that can be imagined can be programmed 👨‍💻 - Alan Kay"
+  </code>
+</pre>
+
+  </p>
+</div>
+
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=sanketnotfound&label=Profile%20views&color=0e75b6&style=flat" alt="sanketnotfound" /> </p>
 
 - 🌱 Figuring out this data engineering thing **Especially how it plays out in Industries and Music 🎶🏭**
