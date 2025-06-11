@@ -1,4 +1,4 @@
-<h1 align="center">Hi 👋, I'm Sanket Veerkar</h1>
+<h1 align="center">Hi 👋, I'm Sanket Aka Vadapav</h1>
 <h3 align="center">Code, Data, Beats — v0.1 beta 🎧</h3>
 
 <div align = "center">
