@@ -14,13 +14,9 @@
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=sanketnotfound&label=Profile%20views&color=0e75b6&style=flat" alt="sanketnotfound" /> </p>
 
-- 🌱 Figuring out this data engineering thing **Especially how it plays out in Industries and Music 🎶🏭**
-
-- 💬 Ask me about **Data Engineer by day, gully coder by heart 💻🎤**
-
 - 📫 How to reach me **sanketvirkar56@gmail.com**
 
-- ⚡ Fun fact **I spend more hours on Spotify than on Instagram**
+- ⚡ Fun fact **I spend more hours on Spotify**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
