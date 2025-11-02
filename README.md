@@ -13,7 +13,7 @@
 </div>
 
 
-- 📫 How to reach me **sanketvirkar56@gmail.com**
+- 📫 **How to reach me sanketvirkar56@gmail.com**
 
 - 😋 **You'll Find me Listening to Music on Spotify or Watching The Office**
 
