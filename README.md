@@ -12,11 +12,10 @@
   </p>
 </div>
 
-<p align="left"> <img src="https://komarev.com/ghpvc/?username=sanketnotfound&label=Profile%20views&color=0e75b6&style=flat" alt="sanketnotfound" /> </p>
 
 - 📫 How to reach me **sanketvirkar56@gmail.com**
 
-- 😋 ** You'll Find me Listening to Music on Spotify or Watching The Office **
+- 😋 **You'll Find me Listening to Music on Spotify or Watching The Office**
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
