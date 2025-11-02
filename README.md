@@ -16,7 +16,7 @@
 
 - 📫 How to reach me **sanketvirkar56@gmail.com**
 
-- ⚡ Fun fact **I spend more hours on Spotify**
+- 😋 ** You'll Find me Listening to Music on Spotify or Watching The Office **
 
 <h3 align="left">Connect with me:</h3>
 <p align="left">
