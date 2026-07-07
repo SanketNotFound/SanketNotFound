@@ -1,0 +1,461 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="canonical" href="https://me.spookyintheam.com/posts/per-route-metrics-using-istio"><meta name="generator" content="Astro v4.16.19"><!-- General Meta Tags --><title>Per-route metrics using Istio | Sanket</title><meta name="title" content="Per-route metrics using Istio | Sanket"><meta name="description" content="How to setup per-route metrics using Istio service mesh"><meta name="author" content="Himanshu"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Per-route metrics using Istio | Sanket"><meta property="og:description" content="How to setup per-route metrics using Istio service mesh"><meta property="og:url" content="https://me.spookyintheam.com/posts/per-route-metrics-using-istio"><meta property="og:image" content="https://vadapav.me/posts/per-route-metrics-using-istio.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2025-09-08T13:17:08.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://me.spookyintheam.com/posts/per-route-metrics-using-istio"><meta property="twitter:title" content="Per-route metrics using Istio | Sanket"><meta property="twitter:description" content="How to setup per-route metrics using Istio service mesh"><meta property="twitter:image" content="https://vadapav.me/posts/per-route-metrics-using-istio.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet"><meta name="theme-color" content=""><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){margin-left:auto;margin-right:auto;margin-bottom:.25rem;margin-top:2rem;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}
+</style>
+<link rel="stylesheet" href="/_astro/about.Ck-cs2Qo.css">
+<style>#main-content:where(.astro-hsp6otuf){margin-left:auto;margin-right:auto;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem;padding-bottom:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;line-height:2rem;font-weight:600}@media (min-width: 640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-bottom:1.5rem;margin-top:.5rem;font-style:italic}
+a:where(.astro-blwjyjpt){position:relative;text-decoration-line:underline;text-decoration-style:dashed}a:where(.astro-blwjyjpt):hover{top:-.125rem;--tw-text-opacity: 1;color:rgba(var(--color-accent),var(--tw-text-opacity, 1))}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){margin-right:-1.25rem;height:1.5rem;width:1.5rem;--tw-scale-x: .95;--tw-scale-y: .95;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-text-opacity: 1;color:rgba(var(--color-text-base),var(--tw-text-opacity, 1));opacity:.8}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}
+@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+.social-icons:where(.astro-wkojbtzc){display:flex;flex-direction:column;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25rem}@media (min-width: 640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x: .9;--tw-scale-y: .9;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate: 6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@media (min-width: 640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){margin-left:auto;margin-right:auto;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem;padding-bottom:3rem}.post-title:where(.astro-vj4tpspi){font-size:1.5rem;line-height:2rem;font-weight:600;--tw-text-opacity: 1;color:rgba(var(--color-accent),var(--tw-text-opacity, 1))}
+</style><script type="module" src="/_astro/hoisted.VFObjY0O.js"></script><style>[data-astro-transition-scope="astro-ti6a3mbw-1"] { view-transition-name: per-route-metrics-using-istio; }@layer astro { ::view-transition-old(per-route-metrics-using-istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(per-route-metrics-using-istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(per-route-metrics-using-istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(per-route-metrics-using-istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-ti6a3mbw-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-ti6a3mbw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-ti6a3mbw-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-ti6a3mbw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-ti6a3mbw-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-ti6a3mbw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-ti6a3mbw-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-ti6a3mbw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-2"] { view-transition-name: service-mesh; }@layer astro { ::view-transition-old(service-mesh) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(service-mesh) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(service-mesh) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(service-mesh) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-3"] { view-transition-name: istio; }@layer astro { ::view-transition-old(istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(istio) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="nav-container astro-3ef6ksr2"> <div class="top-nav-wrap astro-3ef6ksr2"> <a href="/" class="logo whitespace-nowrap astro-3ef6ksr2"> Sanket </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="hamburger-menu focus-outline astro-3ef6ksr2" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="menu-icon astro-3ef6ksr2"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="close astro-3ef6ksr2"></line> <line x1="6" y1="6" x2="18" y2="18" class="close astro-3ef6ksr2"></line> </svg> </button> <ul id="menu-items" class="display-none sm:flex astro-3ef6ksr2"> <li class="astro-3ef6ksr2"> <a href="/Projects/" class=" astro-3ef6ksr2">
+Projects
+</a> </li> <!--  <li>
+            <a href="/tags/" class={activeNav === "tags" ? "active" : ""}>
+              Tags
+            </a>
+          </li> --> <li class="astro-3ef6ksr2"> <a href="/about/" class=" astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/resume/" class=" astro-3ef6ksr2">
+Resume
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search/" class="group inline-block hover:text-skin-accent focus-outline p-3 sm:p-1  flex astro-3ef6ksr2" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="scale-125 sm:scale-100 astro-3ef6ksr2"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="sr-only astro-3ef6ksr2">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="focus-outline astro-3ef6ksr2" title="Toggles light & dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>    <div class="mx-auto flex w-full max-w-3xl justify-start px-2 astro-vj4tpspi"> <button class="focus-outline mb-2 mt-8 flex hover:opacity-75 astro-vj4tpspi" onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="post-title astro-vj4tpspi" data-astro-transition-scope="astro-ti6a3mbw-1">Per-route metrics using Istio</h1> <div class="flex items-center space-x-2 opacity-80 my-2 astro-vj4tpspi"><svg xmlns="http://www.w3.org/2000/svg" class="scale-100 inline-block h-6 w-6 min-w-[1.375rem] fill-skin-base" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time dateTime="2025-09-08T13:17:08.000Z">Sep 8, 2025</time><span aria-hidden="true"> | </span><span class="sr-only"> at </span><span class="text-nowrap">03:17 PM</span></span></div> <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl astro-vj4tpspi"> <h2 id="table-of-contents">Table of contents</h2>
+<p></p><details><summary>Open Table of contents</summary><p></p>
+<ul>
+<li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#what-are-per-route-metrics">What are per-route metrics?</a></li>
+</ul>
+</li>
+<li><a href="#istio-installation">Istio installation</a>
+<ul>
+<li><a href="#installing-via-helm-charts">Installing via Helm charts</a></li>
+</ul>
+</li>
+<li><a href="#enrolling-your-application-in-the-service-mesh-and-enabling-l7-metrics">Enrolling your application in the service mesh and enabling L7 metrics</a></li>
+<li><a href="#visualizing-the-metrics">Visualizing the metrics</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<p></p></details><p></p>
+<h2 id="introduction">Introduction</h2>
+<p>I have been messing around with Istio recently and turns out, its a brilliantly designed service mesh! Sure, the learning curve can be a bit steeper unlike Linkerd which is pretty much plug-and-play but Istio is definitely has its perks.</p>
+<p>After having worked with Istio to use it as a Gateway API controller, I looked into something else. Using Istio to show per-route metrics for applicatins.</p>
+<p>And its pretty straightforward <em>(well, kinda)</em>.</p>
+<h3 id="what-are-per-route-metrics">What are per-route metrics?</h3>
+<p>Say your application serves traffic on two endpoints - <code>GET /healthz</code> and <code>POST /echo</code>, and you need to determine how many requests, or even latency per request each of these endpoints is receiving. This is where per-route metrics come into the picture.</p>
+<p>We can use Istio to show these metrics, and more using its <strong>Telemetry API</strong> and <strong>Kubernetes Gateway API</strong>.</p>
+<p>Gateway API is the newest addition in Kubernetes SIG which is essentially an upgraded version of Ingress. It supports not only host based routing but also header based and even support filters like rewriting the URL or adding custom headers before forwarding the traffic to your applications.</p>
+<p>You can read more about it from <a href="https://gateway-api.sigs.k8s.io/">https://gateway-api.sigs.k8s.io/</a>.</p>
+<p>Here’s a sneak into how it looks like on Grafana:
+<img  src="/_astro/metrics.C5673w7B_Z4oc5Y.webp" alt="metrics" width="2836" height="1350" loading="lazy" decoding="async"></p>
+<p>Let’s see how that works!</p>
+<blockquote>
+<p>I am going to use this application called podinfo which is a microservice template app written in Go. You can find it at <a href="https://github.com/stefanprodan/podinfo">stefanprodan/podinfo</a>.</p>
+</blockquote>
+<h2 id="istio-installation">Istio installation</h2>
+<p>First and foremost, installing Istio. I used Helm for installation but you can use its istioctl CLI or even Kubernetes manifests for it.</p>
+<p>I deployed Istio in the Ambient Mode which is essentially a sidecar-less pattern which uses a node-level proxy to route traffic to your applications.</p>
+<p>The major plus side of this approach is that the proxy is injected without restarting the application pods and we can gradually keep adding applications to the service mesh without disrupting the traffic flow.</p>
+<h3 id="installing-via-helm-charts">Installing via Helm charts</h3>
+<ul>
+<li><strong>Configure the istio Helm repo:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">helm install istio-base istio/base -n istio-system --create-namespace --wait &#x26;&#x26; helm repo update</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li><strong>Install the Istio base CRDs:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">helm install istio-base istio/base -n istio-system --create-namespace --wait</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li><strong>Install Gateway API CRDs:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">kubectl get crd gateways.gateway.networking.k8s.io &#x26;> /dev/null || \</span></span>
+<span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li><strong>Install the control plane:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">helm install istiod istio/istiod --namespace istio-system --set profile=ambient --wait</span></span>
+<span class="line"></span></code></pre>
+<ul>
+<li><strong>Install the CNI node agent:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">helm install istio-cni istio/cni -n istio-system --set profile=ambient --wait</span></span>
+<span class="line"></span></code></pre>
+<blockquote>
+<p><strong>Note: If you use GKE or EKS, there are platform specifc steps you need to follow which can be found <a href="https://istio.io/latest/docs/ambient/install/platform-prerequisites/">here</a></strong></p>
+</blockquote>
+<blockquote>
+<p>You can also find all installation steps at: <a href="https://istio.io/latest/docs/ambient/install/">https://istio.io/latest/docs/ambient/install/</a></p>
+</blockquote>
+<ul>
+<li><strong>Install the data plane:</strong></li>
+</ul>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yml"><code><span class="line"><span style="color:#A6DA95;--shiki-dark:#40A02B">helm install ztunnel istio/ztunnel -n istio-system --wait</span></span>
+<span class="line"></span></code></pre>
+<p>Once done, we’re ready to move forward with the actual steps to get per-route metrics working.</p>
+<h2 id="enrolling-your-application-in-the-service-mesh-and-enabling-l7-metrics">Enrolling your application in the service mesh and enabling L7 metrics</h2>
+<p>Say your applications are deployed in the <code>podinfo</code> namespace. You can inject L3 proxy for all applications in this namespace by adding the label <code>istio.io/dataplane-mode=ambient</code> in the namespace. This enrolls your application in the service mesh.</p>
+<p>Now to support actual L7 traffic which is where we’ll get the route metrics from, we’ll inject something called a Waypoint proxy. This is essentially a Kubernetes Gateway represented as <code>kind: Gateway</code> with the <code>gatewayClassName</code> set to <code>istio-waypoint</code>.</p>
+<p>We apply the following Gateway manifest to get a waypoint running:</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">apiVersion</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> gateway.networking.k8s.io/v1</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">kind</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> Gateway</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">metadata</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo-waypoint</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  namespace</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">spec</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  gatewayClassName</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> istio-waypoint</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  listeners</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">  -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> allowedRoutes</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      namespaces</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">        from</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> Same</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> mesh</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    port</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#F5A97F;--shiki-dark:#FE640B"> 15008</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    protocol</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> HBONE</span></span>
+<span class="line"></span></code></pre>
+<p>Now, we need to label the namespace to use this waypoint. This can be done by labelling the namespace with <code>istio.io/use-waypoint: podinfo-waypoint</code></p>
+<p>This enrolls the namespace within the Istio system to use the <code>podinfo-waypoint</code>.</p>
+<p>Now, onto the main part which is where it gets interesting. If you add Istio’s scrape endpoints to your metrics collector, prometheus in my example, you get <code>istio_requests_*</code> metrics. These don’t expose the metrics that we want by default, but we can expand them to show exactly what we want.</p>
+<p>Istio provides something called a Telemetry API which can be used to extend the envoy proxy it uses for the Waypoint Gateway. That’s exactly what we’re going to do!</p>
+<p>We first need to extend the Envoy proxy used in the Waypoint proxy using a <code>WASMPlugin</code>. We use the Attributegen WASM Plugin here.</p>
+<p>Here’s how to do that:</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">apiVersion</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> extensions.istio.io/v1alpha1</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">kind</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> WasmPlugin</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">metadata</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo-wasmplugin</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  namespace</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">spec</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  targetRefs</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">    -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> kind</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> Gateway</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      group</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> gateway.networking.k8s.io</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo-waypoint</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  url</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> https://storage.googleapis.com/istio-build/proxy/attributegen-359dcd3a19f109c50e97517fe6b1e2676e870c4d.wasm</span><span style="color:#6E738D;font-style:italic;--shiki-dark:#9CA0B0;--shiki-dark-font-style:italic"> # Name of the wasm plugin we want to use</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  imagePullPolicy</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> Always</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  phase</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> AUTHN</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  pluginConfig</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    attributes</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">    -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> output_attribute</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> "istio_operationId"</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      match</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">        -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> value</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> "GET /healthz"</span><span style="color:#6E738D;font-style:italic;--shiki-dark:#9CA0B0;--shiki-dark-font-style:italic"> # Name to show on the metric</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">          condition</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> request.method == 'GET' &#x26;&#x26; request.url_path == '/healthz'</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">        -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> value</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> "POST /echo"</span><span style="color:#CAD3F5;--shiki-dark:#4C4F69"> </span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">          condition</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> request.method == 'POST' &#x26;&#x26; request.url_path == '/echo'</span></span>
+<span class="line"></span>
+<span class="line"></span></code></pre>
+<p>This might seem complicated, but the main part of this are <code>spec.url</code> which is the URL of a WASM plugin. And then <code>pluginConfig.attributes[*].match[*]</code> which is where you define the logic on how the request needs to be get processed.</p>
+<p>Then, we extend the <code>istio_requests_*</code> metrics using a Telemetry plugin. Here’s how its done:</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">apiVersion</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> telemetry.istio.io/v1</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">kind</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> Telemetry</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">metadata</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo-telemetry</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  namespace</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> podinfo</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">spec</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  metrics</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">    -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> overrides</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">        -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> match</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">            metric</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> REQUEST_COUNT</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">            mode</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> CLIENT_AND_SERVER</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">          tagOverrides</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">            route_name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">              value</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> filter_state['wasm.istio_operationId']</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      providers</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">        -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> prometheus</span></span>
+<span class="line"></span>
+<span class="line"></span></code></pre>
+<p>Here, we’re just adding the operation name <code>istio_operationId</code> from <code>WASMPlugin</code> configuration to extend the <code>REQUEST_COUNT</code> metrics exposed by Istio.</p>
+<p>Apply this final yaml and we’re ready.</p>
+<h2 id="visualizing-the-metrics">Visualizing the metrics</h2>
+<p>You need to add your Istio’s endpoint to your prometheus scrape config, something like this:</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">-</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> job_name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> 'istiod'</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  kubernetes_sd_configs</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">  -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> role</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> endpoints</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    namespaces</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">      names</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">      -</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> istio-system</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  relabel_configs</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">  -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> source_labels</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#939AB7;--shiki-dark:#7C7F93"> [</span><span style="color:#A6DA95;--shiki-dark:#40A02B">__meta_kubernetes_service_name</span><span style="color:#939AB7;--shiki-dark:#7C7F93">,</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> __meta_kubernetes_endpoint_port_name</span><span style="color:#939AB7;--shiki-dark:#7C7F93">]</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    action</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> keep</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    regex</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> istiod;http-monitoring</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">-</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> job_name</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> 'envoy-stats'</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  metrics_path</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> /stats/prometheus</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  kubernetes_sd_configs</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">  -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> role</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> pod</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">  relabel_configs</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span></span>
+<span class="line"><span style="color:#939AB7;--shiki-dark:#7C7F93">  -</span><span style="color:#8AADF4;--shiki-dark:#1E66F5"> source_labels</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#939AB7;--shiki-dark:#7C7F93"> [</span><span style="color:#A6DA95;--shiki-dark:#40A02B">__meta_kubernetes_pod_container_port_name</span><span style="color:#939AB7;--shiki-dark:#7C7F93">]</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    action</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> keep</span></span>
+<span class="line"><span style="color:#8AADF4;--shiki-dark:#1E66F5">    regex</span><span style="color:#8BD5CA;--shiki-dark:#179299">:</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> '.*-envoy-prom'</span></span>
+<span class="line"></span></code></pre>
+<p>Now, to test this setup. Setup a curl script to hit a GET request on the Podinfo service at <code>/healthz</code>and another to hit a POST request at <code>/echo</code>.</p>
+<p>This can be done by simply doing something like:</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#C6A0F6;--shiki-dark:#8839EF">while</span><span style="color:#ED8796;font-style:italic;--shiki-dark:#D20F39;--shiki-dark-font-style:italic"> true</span><span style="color:#939AB7;--shiki-dark:#7C7F93">;</span><span style="color:#C6A0F6;--shiki-dark:#8839EF"> do</span><span style="color:#8AADF4;font-style:italic;--shiki-dark:#1E66F5;--shiki-dark-font-style:italic"> curl</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> http://podinfo-svc.podinfo:9898/healthz</span><span style="color:#939AB7;--shiki-dark:#7C7F93">;</span><span style="color:#C6A0F6;--shiki-dark:#8839EF"> done</span></span>
+<span class="line"><span style="color:#6E738D;font-style:italic;--shiki-dark:#9CA0B0;--shiki-dark-font-style:italic"># OR</span></span>
+<span class="line"><span style="color:#C6A0F6;--shiki-dark:#8839EF">while</span><span style="color:#ED8796;font-style:italic;--shiki-dark:#D20F39;--shiki-dark-font-style:italic"> true</span><span style="color:#939AB7;--shiki-dark:#7C7F93">;</span><span style="color:#C6A0F6;--shiki-dark:#8839EF"> do</span><span style="color:#8AADF4;font-style:italic;--shiki-dark:#1E66F5;--shiki-dark-font-style:italic"> curl</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> -X</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> POST</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> -d</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> "test"</span><span style="color:#A6DA95;--shiki-dark:#40A02B"> http://podinfo-svc.podinfo:9898/echo</span><span style="color:#939AB7;--shiki-dark:#7C7F93">;</span><span style="color:#C6A0F6;--shiki-dark:#8839EF"> done</span></span>
+<span class="line"></span></code></pre>
+<p>Then run</p>
+<pre class="astro-code astro-code-themes catppuccin-macchiato catppuccin-latte" style="background-color:#24273a;--shiki-dark-bg:#eff1f5;color:#cad3f5;--shiki-dark:#4c4f69; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>sum(rate(istio_requests_total{destination_app="podinfo", route_name!="unknown"})) by (route_name)</span></span>
+<span class="line"><span></span></span></code></pre>
+<p>to see your metrics! This query essentially returns the rate of change of requests over a time period on the routes, which are returned by the <code>route_name</code> label.</p>
+<p>Since none of this is documented in a step-by-step manner in Istio docs, I hope this helps clear out soomeone’s doubts :)</p>
+<h2 id="references">References</h2> </article> <ul class="my-8 astro-vj4tpspi"> <li class="inline-block my-1 underline-offset-4 astro-blwjyjpt"> <a href="/tags/service-mesh/" class="text-sm pr-2 group astro-blwjyjpt" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class=" scale-75 astro-blwjyjpt"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">service-mesh</span> </a> </li> <li class="inline-block my-1 underline-offset-4 astro-blwjyjpt"> <a href="/tags/istio/" class="text-sm pr-2 group astro-blwjyjpt" data-astro-transition-scope="astro-36ssibgs-3"> <svg xmlns="http://www.w3.org/2000/svg" class=" scale-75 astro-blwjyjpt"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">istio</span> </a> </li>  </ul> <div class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4 astro-vj4tpspi"> <button id="back-to-top" class="focus-outline whitespace-nowrap py-1 hover:opacity-75 astro-vj4tpspi"> <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90 astro-vj4tpspi"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button>  </div> </main> <footer class="mt-auto astro-sz7xmlte"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="footer-wrapper astro-sz7xmlte"> <div class="social-icons flex astro-upu6fzxr"> <a href="https://github.com/VadapavKahaanHai" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title=" Sanket on Github"> <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="icon-tabler"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path
+      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
+    ></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> Sanket on Github</span> </a><a href="https://www.linkedin.com/in/sanketakavadapav/" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="Sanket on LinkedIn"> <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="icon-tabler"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+    <line x1="8" y1="11" x2="8" y2="16"></line>
+    <line x1="8" y1="8" x2="8" y2="8.01"></line>
+    <line x1="12" y1="16" x2="12" y2="11"></line>
+    <path d="M16 16v-3a2 2 0 0 0 -4 0"></path>
+  </svg> <span class="sr-only astro-upu6fzxr">Sanket on LinkedIn</span> </a><a href="https://discord.com/users/1075442569128980591" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="Sanket on Discord"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <circle cx="9" cy="12" r="1"></circle>
+      <circle cx="15" cy="12" r="1"></circle>
+      <path d="M7.5 7.5c3.5 -1 5.5 -1 9 0"></path>
+      <path d="M7 16.5c3.5 1 6.5 1 10 0"></path>
+      <path d="M15.5 17c0 1 1.5 3 2 3c1.5 0 2.833 -1.667 3.5 -3c.667 -1.667 .5 -5.833 -1.5 -11.5c-1.457 -1.015 -3 -1.34 -4.5 -1.5l-1 2.5"></path>
+      <path d="M8.5 17c0 1 -1.356 3 -1.832 3c-1.429 0 -2.698 -1.667 -3.333 -3c-.635 -1.667 -.476 -5.833 1.428 -11.5c1.388 -1.015 2.782 -1.34 4.237 -1.5l1 2.5"></path>
+    </svg> <span class="sr-only astro-upu6fzxr">Sanket on Discord</span> </a><a href="https://open.spotify.com/user/31xzfhs6qrsfwxwh6eogmqbosjvq?si=9VXGYvIkT1OjvJ5AqwteCw" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="Sanket on Discord"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+      <path d="M8 11.973c2.5 -1.473 5.5 -.973 7.5 .527"></path>
+      <path d="M9 15c1.5 -1 4 -1 5 .5"></path>
+      <path d="M7 9c2 -1 6 -2 10 .5"></path>
+    </svg> <span class="sr-only astro-upu6fzxr">Sanket on Discord</span> </a> </div>  <div class="copyright-wrapper astro-sz7xmlte"> <span class="astro-sz7xmlte">Copyright &#169; 2026</span> <span class="separator astro-sz7xmlte">&nbsp;|&nbsp;</span> <span class="astro-sz7xmlte">Made By Vadapav</span> </div> </div> </footer>   </body></html>  <script>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-skin-accent";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body or any other desired parent element
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    const winScroll =
+      document.body.scrollTop || document.documentElement.scrollTop;
+    const height =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    if (document) {
+      const myBar = document.getElementById("myBar");
+      if (myBar) {
+        myBar.style.width = scrolled + "%";
+      }
+    }
+  }
+  document.addEventListener("scroll", updateScrollProgress);
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
+    for (let heading of headings) {
+      heading.classList.add("group");
+      let link = document.createElement("a");
+      link.innerText = "#";
+      link.className = "heading-link hidden group-hover:inline-block ml-2";
+      link.href = "#" + heading.id;
+      link.ariaHidden = "true";
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    let copyButtonLabel = "Copy";
+    let codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (let codeBlock of codeBlocks) {
+      let wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      let copyButton = document.createElement("button");
+      copyButton.className =
+        "copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      let code = block.querySelector("code");
+      let text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    document.querySelector("#back-to-top")?.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+  }
+  backToTop();
+</script>

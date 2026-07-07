@@ -14,5 +14,22 @@
         "description": "A production-ready web scraper for extracting comprehensive property data from MagicBricks.com, India's leading real estate marketplace. The scraper collects detailed property information and stores it in a PostgreSQL database for analysis.",
         "technologies": ["Python", "BeautifulSoup", "PostgreSQL", "Claude Code", "Selenium Base"],
         "featured": true
+    },
+    {
+        "title": "Growing Up Narratives",
+        "slug": "growing-up-narratives",
+        "link": "https://github.com/YOUR_USERNAME/growing-up-narratives",
+        "description": "An end-to-end data engineering and NLP pipeline that collects public essays from RSS feeds, validates and stores article data in PostgreSQL, enriches records with sentiment, themes, keywords, topics, and life-stage signals, and surfaces insights through a Streamlit analytics dashboard.",
+        "technologies": [
+            "Python",
+            "PostgreSQL",
+            "Apache Airflow",
+            "Docker",
+            "Streamlit",
+            "spaCy",
+            "scikit-learn",
+            "NLTK"
+        ],
+        "featured": true
     }
 ]
