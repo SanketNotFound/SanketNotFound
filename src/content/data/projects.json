@@ -5,7 +5,7 @@
         "link": "https://github.com/VadapavKahaanHai/meow_fact_pipeline",
         "description": "An ETL pipeline built with Apache Airflow that extracts cat facts from an API, transforms the data, and loads it into PostgreSQL. This project demonstrates core data engineering concepts including workflow orchestration, API integration, and database operations.",
         "technologies": ["Python", "Docker", "Apache Airflow", "PostgreSQL"],
-        "featured": true
+        "featured": false
     },
     {
         "title": "MagicBricks Scraper",
