@@ -81,26 +81,7 @@ const socialCount = SOCIALS.filter((social) => social.active).length;
         {recentProjects.length > 0 && <Hr />}
       </>
     )}
- {recentProjects.length > 0 && (
-      <section id="recent-posts">
-        <h2>Recent Projects</h2>
-        <ul>
-          {recentProjects.map((project, index) => (
-            index < 4 && (
-              <Card
-                href={project.link}
-                frontmatter={{
-                  title: project.title,
-                  description: project.description,
-                  technologies: project.technologies
-                }}
-                secHeading={false}
-              />
-            )
-          ))}
-        </ul>
-      </section>
-    )}
+
 
     <div class="all-posts-btn-wrapper">
       <LinkButton href="/Projects/">
