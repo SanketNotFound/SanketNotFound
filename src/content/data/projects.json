@@ -13,6 +13,14 @@
         "link": "https://github.com/VadapavKahaanHai/MB-Scraper",
         "description": "A production-ready web scraper for extracting comprehensive property data from MagicBricks.com, India's leading real estate marketplace. The scraper collects detailed property information and stores it in a PostgreSQL database for analysis.",
         "technologies": ["Python", "BeautifulSoup", "PostgreSQL", "Claude Code", "Selenium Base"],
+        "featured": false
+    },
+    {
+        "title": "VadaDB",
+        "slug": "Vada-DB",
+        "link": "https://github.com/VadapavKahaanHai/VadaDB",
+        "description": "fault-tolerant sharded key-value database that uses XOR fusion to recover one failed shard with less backup storage than full replication.",
+        "technologies": ["Go"],
         "featured": true
     },
     {
